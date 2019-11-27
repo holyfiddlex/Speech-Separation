@@ -3,9 +3,11 @@
 __all__ = ["index", "modules"]
 
 index = {"load_audio": "00_core.ipynb",
+         "AudioItem": "00_core.ipynb",
          "time_bins": "01_utils.ipynb",
          "stft": "01_utils.ipynb",
          "istft": "01_utils.ipynb",
+         "Resample": "01_utils.ipynb",
          "setup_graph": "02_plot.ipynb",
          "ColorMeshPlotter": "02_plot.ipynb",
          "cmap_dict": "02_plot.ipynb",
