@@ -3,9 +3,7 @@
 __all__ = ['time_bins', 'stft', 'istft', 'Resample']
 
 #Cell
-import scipy
-import numpy as np
-import scipy.io.wavfile
+from .imports import *
 
 #Cell
 def time_bins(X, window_size, overlap):
@@ -68,12 +66,11 @@ def istft(X, fftsize=512, win_mult=2, overlap=0.5, normalize=False):
 
 #Cell
 def Resample(sr_new):
-    def _inner(ai):
+    def _inner(sig, sr):
         '''Resample using faster polyphase technique and avoiding FFT computation'''
-        if(ai.sr == sr_new): return AudioItem(ai)
-        sig_np = ai.sig.numpy()
-        sr_gcd = math.gcd(ai.sr, sr_new)
-        resampled = resample_poly(sig_np, int(sr_new/sr_gcd), int(ai.sr/sr_gcd), axis=-1)
-        resampled = resampled.astype(np.float32)
-        return AudioItem((torch.from_numpy(resampled), sr_new, ai.path))
+        if(sr == sr_new): return sig
+        sr_gcd = math.gcd(sr, sr_new)
+        resampled = resample_poly(sig, int(sr_new/sr_gcd), int(sr/sr_gcd), axis=-1)
+        #resampled = resampled.astype(np.float32)
+        return resampled
     return _inner

@@ -3,9 +3,7 @@
 __all__ = ['setup_graph', 'ColorMeshPlotter', 'cmap_dict', 'cmap']
 
 #Cell
-import matplotlib
-import matplotlib.pyplot as plt
-from functools import partial
+from .imports import *
 
 #Cell
 def setup_graph(title='', x_label='', y_label='', fig_size=None):

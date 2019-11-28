@@ -4,6 +4,8 @@ __all__ = ["index", "modules"]
 
 index = {"load_audio": "00_core.ipynb",
          "AudioItem": "00_core.ipynb",
+         "toSpec": "00_core.ipynb",
+         "SpecBase": "00_core.ipynb",
          "time_bins": "01_utils.ipynb",
          "stft": "01_utils.ipynb",
          "istft": "01_utils.ipynb",
