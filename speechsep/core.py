@@ -39,19 +39,36 @@ class AudioItem():
         self._sr = new_sr
 
 #Cell
-def toSpec(audio:AudioItem):
-    pass
+class toSpec(core.Transform):
+    def __init__(self, fftsize=512, win_mult=2, overlap=0.5, freq='linear', amp='linear'):
+        self.fftsize = fftsize
+        self.win_mult = win_mult
+        self.overlap = overlap
+        self.freq = freq
+        self.amp = amp
+    def encodes(self, audio:AudioItem):
+        spec = utils.stft(audio.sig, self.fftsize, self.win_mult, self.overlap)
+        return SpecBase(spec, audio.sr, audio.fn)
+    def decodes(self, spec):
+        audio = utils.istft(spec.data, self.fftsize, self.win_mult, self.overlap)
+        return AudioItem(spec.fn, audio, spec.sr)
+
 
 #Cell
 class SpecBase():
-    def __init__(self, spec, sr, name=None):
+    def __init__(self, spec, sr, fn=None):
         self.data = spec
         self.sr = sr
-        self.name = name
-    @classmethod
-    def create(cls, fn, sr=None, name=None):
-        "Open an `Audio` from path `fn`"
-        if isinstance(fn,(Path,str)): return cls.create(AudioItem(fn, sr), name=name)
-        elif isinstance(fn,AudioItem): return toSpec(fn.sig, fn.sr, name)
-        elif isinstance(fn,np.ndarray): return cls(fn, sr, name)
-        raise ValueError('fn must be ndarray, AudioItem or Path')
+        self.fn = fn
+        self._plt_params = {}
+    @delegates(plot.setup_graph)
+    def show(self, ctx=None, **kwargs):
+        plot.setup_graph(**kwargs)
+        plt.pcolormesh(abs(spec.data[:spec.data.shape[0]//2]))
+    @property
+    def plt_params(self): return self._plt_params
+    @plt_params.setter
+    @delegates(plt.pcolormesh)
+    def plt_params(self, **kwargs):
+        self._plot = partial(plt.pcolormesh, **kwargs)
+        self._plt_params = dict(**kwargs)
