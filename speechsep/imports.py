@@ -4,6 +4,7 @@ import fastai2.torch_basics as basics
 from functools import partial
 from pathlib import Path
 from nbdev.tools import *
+from nbdev.imports import test_eq
 
 import matplotlib
 import matplotlib.pyplot as plt
