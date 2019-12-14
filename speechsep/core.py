@@ -5,7 +5,7 @@ __all__ = ['load_audio', 'AudioBase', 'AudioMono', 'show_audio', 'SpecImage', 'S
 
 #Cell
 from .imports import *
-from .utils import stft,istft,Resample
+from .utils import stft,istft,ResampleSignal
 from .plot import setup_graph
 
 #Cell
@@ -34,7 +34,7 @@ class AudioMono(AudioBase):
     def sr(self): return self._sr
     @sr.setter
     def sr(self, new_sr):
-        if self._sr != new_sr: self.sig = Resample(new_sr)(self.sig, self.sr)
+        if self._sr != new_sr: self.sig = ResampleSignal(new_sr)(self.sig, self.sr)
         self._sr = new_sr
 
 #Cell
