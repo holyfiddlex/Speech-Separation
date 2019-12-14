@@ -1,5 +1,6 @@
 from fastai2.data.all import *
 from fastai2.vision.all import *
+from fastcore import *
 from functools import partial
 from pathlib import Path
 from nbdev.tools import *
