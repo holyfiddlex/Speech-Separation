@@ -3,7 +3,9 @@
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
 index = {"load_audio": "00_core.ipynb",
+         "AudioBase": "00_core.ipynb",
          "AudioMono": "00_core.ipynb",
+         "show_audio": "00_core.ipynb",
          "SpecImage": "00_core.ipynb",
          "Spectify": "00_core.ipynb",
          "show": "00_core.ipynb",
@@ -20,7 +22,8 @@ index = {"load_audio": "00_core.ipynb",
 
 modules = ["core.py",
            "utils.py",
-           "plot.py"]
+           "plot.py",
+           "data.py"]
 
 git_url = "https://github.com/holyfiddlex/speechsep/tree/master/"
 
