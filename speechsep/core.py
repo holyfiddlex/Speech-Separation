@@ -238,5 +238,10 @@ def encodes(self, o:SpecImage): return o._tensor_cls(spec2tensor(o))
 def encodes(self, o:MaskBase): return o._tensor_cls(mask2tensor(o))
 
 def audio2tensor(aud:AudioBase): return Tensor(aud.sig)
-def spec2tensor(spec:SpecImage): return Tensor(spec.data)
+def spec2tensor(spec:SpecImage):
+    data = spec.data
+    if data.dtype == np.complex128:
+        data = np.concatenate((data.real[..., np.newaxis], data.imag[..., np.newaxis]), axis=-1)
+        data = data.T
+    return Tensor(data)
 def mask2tensor(mask:MaskBase): return Tensor(mask.data)
