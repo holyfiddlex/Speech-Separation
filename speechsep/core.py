@@ -209,7 +209,7 @@ class ArraySpecBase(ArrayBase):
 class ArrayMaskBase(ArrayBase):
     _show_args = {}
     def show(self, **kwargs):
-        return show_spec(self, ctx=ctx, **{**self._show_args, **kwargs})
+        return show_mask(self, ctx=ctx, **{**self._show_args, **kwargs})
 
 class TensorAudio(TensorBase):
     _show_args = ArrayAudioBase._show_args
@@ -228,6 +228,8 @@ class TensorMask(TensorBase):
 
 #Cell
 AudioMono._tensor_cls = TensorAudio
+SpecImage._tensor_cls = TensorSpec
+MaskBase._tensor_cls = TensorMask
 @ToTensor
 def encodes(self, o:AudioBase): return o._tensor_cls(audio2tensor(o))
 @ToTensor

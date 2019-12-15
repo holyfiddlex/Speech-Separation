@@ -41,7 +41,6 @@ index = {"load_audio": "00_core.ipynb",
          "cmap": "02_plot.ipynb",
          "get_audio_files": "03_data.ipynb",
          "AudioBlock": "03_data.ipynb",
-         "SpecBlock": "03_data.ipynb",
          "audio_extensions": "03_data.ipynb"}
 
 modules = ["core.py",
