@@ -4,7 +4,7 @@ __all__ = ['load_audio', 'ResampleSignal', 'AudioBase', 'AudioMono', 'duration',
            'show_batch', 'pre_plot', 'post_plot', 'show', 'show_audio', 'show', 'show_spec', 'show', 'show_mask',
            'hear_audio', 'ArrayAudioBase', 'ArraySpecBase', 'ArrayMaskBase', 'TensorAudio', 'TensorSpec', 'TensorMask',
            'encodes', 'encodes', 'encodes', 'audio2tensor', 'spec2tensor', 'mask2tensor', 'Spectify', 'create',
-           'Resample', 'Clip', 'PhaseManager', 'complex2real', 'complex2real_r']
+           'Resample', 'Clip', 'PhaseManager', 'complex2real', 'real2complex']
 
 #Cell
 from .imports import *
@@ -202,22 +202,22 @@ def mask2tensor(mask:MaskBase):  return TensorMask(mask.data)
 
 #Cell
 class Spectify(Transform):
-    def __init__(self, sample_rate=48000, fftsize=512, win_mult=2, overlap=0.5, decibel=False, mel_bin=False):
-        store_attr(self, 'sample_rate, fftsize, win_mult, overlap, decibel, mel_bin')
+    def __init__(self, sr=48000, fftsize=512, win_mult=2, overlap=0.5, decibel=False, mel_bin=False):
+        store_attr(self, 'sr, fftsize, win_mult, overlap, decibel, mel_bin')
     def encodes(self, audio:AudioMono):
         spec = stft(audio.sig, self.fftsize, self.win_mult, self.overlap)
         if self.decibel: pass #TODO Encode
         if self.mel_bin: pass #TODO Encode
         return SpecImage(spec, audio.sr, audio.fn)
-    def decodes(self, spec:(ArraySpecBase, SpecImage)):
+    def decodes(self, spec:SpecImage):
         if self.mel_bin: pass #TODO Decode
         if self.decibel: pass #TODO Decode
-        print(f"in decode {type(spec)}")
-        if isinstance(spec, SpecImage):
-            audio = istft(spec.data, self.fftsize, self.win_mult, self.overlap)
-            return AudioMono(audio, spec.sr, spec.fn)
-        audio = istft(spec, self.fftsize, self.win_mult, self.overlap)
-        return AudioMono(audio, self.sample_rate)
+        audio = istft(spec.data, self.fftsize, self.win_mult, self.overlap)
+        return AudioMono(audio, spec.sr, spec.fn)
+    def decodes(self, data:ArraySpecBase):
+        if self.mel_bin: pass #TODO Decode
+        if self.decibel: pass #TODO Decode
+        return SpecImage(data, self.sr)
 
 #Cell
 @patch_clsmthd
@@ -254,9 +254,16 @@ class PhaseManager(Transform):
     def encodes(self, spec:SpecImage):
         if self.mthd == 'new_dim': return complex2real(spec)
 
-    def decodes(self, spec:TensorSpec)->SpecImage:
+    #BUG ArraySpecBase not Casting to return value
+    def decodes(self, spec:TensorSpec)->ArraySpecBase:
         if self.mthd == 'new_dim':
-            return SpecImage(complex2real_r(spec),48000)
+            spec = real2complex(spec)
+            #HACK not sure how else to get the output to be and ArraySpecBase
+            # If this is removed Spectify would have to decode a numpy array and that's not always what we want.
+            # If it doesn't find how to decode an ndarray it will try to show and ndarray doesn't have that function
+            temp = ArraySpecBase(spec.shape, dtype=np.complex)
+            temp[:,:] = spec
+            return temp
 
 
 def complex2real(spec):
@@ -265,6 +272,6 @@ def complex2real(spec):
         spec.data = spec.data.T
     return spec
 
-def complex2real_r(data):
+def real2complex(data):
     data = data.numpy().T
     return data[..., 0] + data[..., 1]*1j
