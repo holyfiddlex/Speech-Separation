@@ -49,7 +49,8 @@ index = {"load_audio": "00_core.ipynb",
 modules = ["core.py",
            "utils.py",
            "plot.py",
-           "data.py"]
+           "data.py",
+           "learner.py"]
 
 git_url = "https://github.com/holyfiddlex/speechsep/tree/master/"
 
