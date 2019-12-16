@@ -4,7 +4,7 @@ __all__ = ['load_audio', 'ResampleSignal', 'AudioBase', 'AudioMono', 'duration',
            'MaskBase', 'MaskBinary', 'show_batch', 'pre_plot', 'post_plot', 'show', 'show_audio', 'show', 'show_spec',
            'show', 'show_mask', 'hear_audio', 'Resample', 'Clip', 'ArrayAudioBase', 'ArraySpecBase', 'ArrayMaskBase',
            'TensorAudio', 'TensorSpec', 'TensorMask', 'encodes', 'encodes', 'encodes', 'audio2tensor', 'spec2tensor',
-           'mask2tensor']
+           'mask2tensor', 'PhaseManager', 'complex2real', 'complex2real_r']
 
 #Cell
 from .imports import *
@@ -76,18 +76,22 @@ class SpecImage():
 
 #Cell
 class Spectify(Transform):
-    def __init__(self, fftsize=512, win_mult=2, overlap=0.5, decibel=False, mel_bin=False):
-        store_attr(self, 'fftsize, win_mult, overlap, decibel, mel_bin')
+    def __init__(self, sample_rate=48000, fftsize=512, win_mult=2, overlap=0.5, decibel=False, mel_bin=False):
+        store_attr(self, 'sample_rate, fftsize, win_mult, overlap, decibel, mel_bin')
     def encodes(self, audio:AudioMono):
         spec = stft(audio.sig, self.fftsize, self.win_mult, self.overlap)
         if self.decibel: pass #TODO Encode
         if self.mel_bin: pass #TODO Encode
         return SpecImage(spec, audio.sr, audio.fn)
-    def decodes(self, spec):
-        audio = istft(spec.data, self.fftsize, self.win_mult, self.overlap)
-        if self.decibel: pass #TODO Decode
+    def decodes(self, spec:(ArraySpecBase, SpecImage)):
         if self.mel_bin: pass #TODO Decode
-        return AudioMono(audio, spec.sr, spec.fn)
+        if self.decibel: pass #TODO Decode
+        print(f"in decode {type(spec)}")
+        if isinstance(spec, SpecImage):
+            audio = istft(spec.data, self.fftsize, self.win_mult, self.overlap)
+            return AudioMono(audio, spec.sr, spec.fn)
+        audio = istft(spec, self.fftsize, self.win_mult, self.overlap)
+        return AudioMono(audio, self.sample_rate)
 
 #Cell
 @patch_clsmthd
@@ -235,13 +239,32 @@ def encodes(self, o:AudioBase): return o._tensor_cls(audio2tensor(o))
 @ToTensor
 def encodes(self, o:SpecImage): return o._tensor_cls(spec2tensor(o))
 @ToTensor
-def encodes(self, o:MaskBase): return o._tensor_cls(mask2tensor(o))
+def encodes(self, o:MaskBase):  return o._tensor_cls(mask2tensor(o))
 
-def audio2tensor(aud:AudioBase): return Tensor(aud.sig)
-def spec2tensor(spec:SpecImage):
-    data = spec.data
-    if data.dtype == np.complex128:
-        data = np.concatenate((data.real[..., np.newaxis], data.imag[..., np.newaxis]), axis=-1)
-        data = data.T
-    return Tensor(data)
-def mask2tensor(mask:MaskBase): return Tensor(mask.data)
+def audio2tensor(aud:AudioBase): return TensorAudio(aud.sig)
+def spec2tensor(spec:SpecImage): return TensorSpec(spec.data)
+def mask2tensor(mask:MaskBase):  return TensorMask(mask.data)
+
+#Cell
+class PhaseManager(Transform):
+    def __init__(self, mthd="new_dim", cls=SpecImage):
+        assert mthd in ['new_dim', 'remove', 'replace'], 'phase method must be either new_dim, remove or replace'
+        store_attr(self, 'mthd, cls')
+
+    def encodes(self, spec:SpecImage):
+        if self.mthd == 'new_dim': return complex2real(spec)
+
+    def decodes(self, spec:TensorSpec)->SpecImage:
+        if self.mthd == 'new_dim':
+            return SpecImage(complex2real_r(spec),48000)
+
+
+def complex2real(spec):
+    if np.iscomplexobj(spec.data):
+        spec.data = np.concatenate((spec.data.real[..., np.newaxis], spec.data.imag[..., np.newaxis]), axis=-1)
+        spec.data = spec.data.T
+    return spec
+
+def complex2real_r(data):
+    data = data.numpy().T
+    return data[..., 0] + data[..., 1]*1j
