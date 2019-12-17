@@ -4,7 +4,7 @@ __all__ = ['load_audio', 'ResampleSignal', 'AudioBase', 'AudioMono', 'duration',
            'show_batch', 'pre_plot', 'post_plot', 'show', 'show_audio', 'show', 'show_spec', 'show', 'show_mask',
            'hear_audio', 'ArrayAudioBase', 'ArraySpecBase', 'ArrayMaskBase', 'TensorAudio', 'TensorSpec', 'TensorMask',
            'encodes', 'encodes', 'encodes', 'audio2tensor', 'spec2tensor', 'mask2tensor', 'Spectify', 'Decibelify',
-           'Mel_Binify_lib', 'create', 'Resample', 'Clip', 'PhaseManager']
+           'Mel_Binify_lib', 'MFCCify', 'create', 'Resample', 'Clip', 'PhaseManager']
 
 #Cell
 from .imports import *
@@ -224,12 +224,24 @@ class Decibelify(Transform):
         return spec
 
 #Cell
+from librosa.feature import melspectrogram
 class Mel_Binify_lib(Transform):
-    @delegates(librosa.mel)
-    def __init__(self): pass #TODO Parameters f_max f_min | check more on librosas melbin
-    #TODO Add librosa melbin straight from audio?
-    def encodes(self,spec:SpecImage): pass
-    def decodes(self,spec:SpecImage): pass
+    @delegates(melspectrogram)
+    def __init__(self, **kwargs):
+        self.audio2mel = partial(melspectrogram, **kwargs)
+    def encodes(self,audio:AudioBase):
+        spec = self.audio2mel(audio.sig, audio.sr)
+        return SpecImage(spec, audio.sr)
+
+#Cell
+from librosa.feature import mfcc
+class MFCCify(Transform):
+    @delegates(mfcc)
+    def __init__(self, **kwargs):
+        self.audio2mfcc = partial(mfcc, **kwargs)
+    def encodes(self,audio:AudioBase):
+        spec = self.audio2mfcc(audio.sig, audio.sr)
+        return SpecImage(spec, audio.sr)
 
 #Cell
 @patch_clsmthd
