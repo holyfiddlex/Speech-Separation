@@ -4,7 +4,7 @@ __all__ = ['load_audio', 'ResampleSignal', 'AudioBase', 'AudioMono', 'duration',
            'show_batch', 'pre_plot', 'post_plot', 'show', 'show_audio', 'show', 'show_spec', 'show', 'show_mask',
            'hear_audio', 'ArrayAudioBase', 'ArraySpecBase', 'ArrayMaskBase', 'TensorAudio', 'TensorSpec', 'TensorMask',
            'encodes', 'encodes', 'encodes', 'audio2tensor', 'spec2tensor', 'mask2tensor', 'Spectify', 'Decibelify',
-           'Mel_Binify_lib', 'create', 'Resample', 'Clip', 'PhaseManager', 'complex2real', 'real2complex']
+           'Mel_Binify_lib', 'create', 'Resample', 'Clip', 'PhaseManager']
 
 #Cell
 from .imports import *
@@ -276,14 +276,3 @@ class PhaseManager(Transform):
             temp = ArraySpecBase(spec.shape, dtype=np.complex)
             temp[:,:] = spec
             return temp
-
-
-def complex2real(spec):
-    if np.iscomplexobj(spec.data):
-        spec.data = np.concatenate((spec.data.real[..., np.newaxis], spec.data.imag[..., np.newaxis]), axis=-1)
-        spec.data = spec.data.T
-    return spec
-
-def real2complex(data):
-    data = data.numpy().T
-    return data[..., 0] + data[..., 1]*1j
