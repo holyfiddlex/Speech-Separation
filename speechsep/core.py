@@ -3,8 +3,8 @@
 __all__ = ['load_audio', 'ResampleSignal', 'AudioBase', 'AudioMono', 'duration', 'SpecImage', 'MaskBase', 'MaskBinary',
            'show_batch', 'pre_plot', 'post_plot', 'show', 'show_audio', 'show', 'show_spec', 'show', 'show_mask',
            'hear_audio', 'ArrayAudioBase', 'ArraySpecBase', 'ArrayMaskBase', 'TensorAudio', 'TensorSpec', 'TensorMask',
-           'encodes', 'encodes', 'encodes', 'audio2tensor', 'spec2tensor', 'mask2tensor', 'Spectify', 'create',
-           'Resample', 'Clip', 'PhaseManager', 'complex2real', 'real2complex']
+           'encodes', 'encodes', 'encodes', 'audio2tensor', 'spec2tensor', 'mask2tensor', 'Spectify', 'Decibelify',
+           'Mel_Binify_lib', 'create', 'Resample', 'Clip', 'PhaseManager', 'complex2real', 'real2complex']
 
 #Cell
 from .imports import *
@@ -202,22 +202,34 @@ def mask2tensor(mask:MaskBase):  return TensorMask(mask.data)
 
 #Cell
 class Spectify(Transform):
-    def __init__(self, sr=48000, fftsize=512, win_mult=2, overlap=0.5, decibel=False, mel_bin=False):
-        store_attr(self, 'sr, fftsize, win_mult, overlap, decibel, mel_bin')
+    def __init__(self, sr=48000, stft=stft, istft=istft):
+        store_attr(self, 'sr, stft, istft')
     def encodes(self, audio:AudioMono):
-        spec = stft(audio.sig, self.fftsize, self.win_mult, self.overlap)
-        if self.decibel: pass #TODO Encode
-        if self.mel_bin: pass #TODO Encode
+        spec = self.stft(audio.sig)
         return SpecImage(spec, audio.sr, audio.fn)
     def decodes(self, spec:SpecImage):
-        if self.mel_bin: pass #TODO Decode
-        if self.decibel: pass #TODO Decode
-        audio = istft(spec.data, self.fftsize, self.win_mult, self.overlap)
+        audio = self.istft(spec.data)
         return AudioMono(audio, spec.sr, spec.fn)
     def decodes(self, data:ArraySpecBase):
-        if self.mel_bin: pass #TODO Decode
-        if self.decibel: pass #TODO Decode
         return SpecImage(data, self.sr)
+
+#Cell
+class Decibelify(Transform):
+    def __init__(self): pass
+    def encodes(self,spec:SpecImage):
+        spec.data = np.log(spec.data)
+        return spec
+    def decodes(self,spec:SpecImage):
+        spec.data = np.exp(spec.data)
+        return spec
+
+#Cell
+class Mel_Binify_lib(Transform):
+    @delegates(librosa.mel)
+    def __init__(self): pass #TODO Parameters f_max f_min | check more on librosas melbin
+    #TODO Add librosa melbin straight from audio?
+    def encodes(self,spec:SpecImage): pass
+    def decodes(self,spec:SpecImage): pass
 
 #Cell
 @patch_clsmthd
