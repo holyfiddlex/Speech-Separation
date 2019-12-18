@@ -34,8 +34,12 @@ class SpecImage(SpecBase): pass
 
 #Cell
 class MaskBinary(MaskBase):
-    def __mult__(self, spec): pass
-    def __generate__(self, joined, aud): pass
+    def __mul__(self, spec):
+        new_spec = SpecImage(spec.data*self.data, spec.sr, spec.fn)
+        return new_spec
+    @classmethod
+    def generate(cls, joined, spec):
+        return cls((joined.data <= spec.data)*1)
 
 #Cell
 @typedispatch

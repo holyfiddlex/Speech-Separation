@@ -73,7 +73,7 @@ def show_spec(spec, ax=None, pltsize=None, title=None, ctx=None, x_label=None, y
 @delegates(plt.pcolormesh)
 def show_mask(mask, ax=None, pltsize=None, title=None, ctx=None, x_label=None, y_label=None, axis=False, **kwargs):
     ax, mask = pre_plot(mask, MaskBase, ax, pltsize, ctx)
-    ax.pcolormesh(maks, **kwargs)
+    ax.pcolormesh(mask, **kwargs)
     return post_plot(ax, title, x_label, y_label, axis)
 
 #Cell
