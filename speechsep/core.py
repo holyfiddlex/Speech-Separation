@@ -12,9 +12,7 @@ from .plot import *
 from .base import *
 
 #Cell
-@delegates(load)
-def load_audio(fn, **kwargs):
-    return load(fn)
+load_audio = load
 
 #Cell
 class AudioMono(AudioBase):
