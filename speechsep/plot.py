@@ -5,7 +5,6 @@ __all__ = ['setup_graph', 'ColorMeshPlotter', 'cmap_dict', 'cmap', 'pre_plot', '
 
 # Cell
 from .imports import *
-from .base import *
 
 # Cell
 def setup_graph(title='', x_label='', y_label='', fig_size=None):
@@ -41,11 +40,10 @@ cmap_dict = {'red':  ((0.0, 0.0156, 0.0156),
 cmap = matplotlib.colors.LinearSegmentedColormap(None,cmap_dict,256)
 
 # Cell
-def pre_plot(o, cls, ax=None, pltsize=None, ctx=None):
+def pre_plot(o, ax=None, pltsize=None, ctx=None):
     ax = ifnone(ax,ctx)
     if ax is None: _,ax = plt.subplots(figsize=pltsize)
-    if isinstance(o, cls): o = o.data;
-    elif not isinstance(o,np.ndarray): o=array(o)
+    o = o if isinstance(o,np.ndarray) else o.data
     return ax, o
 
 def post_plot(ax, title, x_label, y_label, axis=False):
@@ -58,25 +56,26 @@ def post_plot(ax, title, x_label, y_label, axis=False):
 # Cell
 @delegates(plt.plot)
 def show_audio(aud, ax=None, pltsize=None, title=None, ctx=None, x_label=None, y_label=None, axis=False, **kwargs):
-    ax, aud = pre_plot(aud, AudioBase, ax, pltsize, ctx)
+    ax, aud = pre_plot(aud, ax, pltsize, ctx)
     ax.plot(aud, **kwargs)
     return post_plot(ax, title, x_label, y_label, axis)
 
 # Cell
 @delegates(plt.pcolormesh)
 def show_spec(spec, ax=None, pltsize=None, title=None, ctx=None, x_label=None, y_label=None, axis=False, **kwargs):
-    ax, spec = pre_plot(spec, SpecBase, ax, pltsize, ctx)
+    ax, spec = pre_plot(spec, ax, pltsize, ctx)
     ax.pcolormesh(np.abs(spec.data[:spec.data.shape[0]//2]), **kwargs)
     return post_plot(ax, title, x_label, y_label, axis)
 
 # Cell
 @delegates(plt.pcolormesh)
 def show_mask(mask, ax=None, pltsize=None, title=None, ctx=None, x_label=None, y_label=None, axis=False, **kwargs):
-    ax, mask = pre_plot(mask, MaskBase, ax, pltsize, ctx)
+    ax, mask = pre_plot(mask, ax, pltsize, ctx)
     ax.pcolormesh(mask, **kwargs)
     return post_plot(ax, title, x_label, y_label, axis)
 
 # Cell
-def hear_audio(aud, sr=48000, **kwargs):
-    if isinstance(aud, AudioBase):  display(Audio(aud.sig, rate=aud.sr))
-    else:                           display(Audio(aud, rate=sr))
+def hear_audio(aud, sr=48000):
+    if hasattr(aud, "listen"):     aud.listen()
+    elif isinstance(aud, ndarray): display(Audio(aud, rate=sr))
+    else:                          display(Audio(aud.data, rate=sr))
