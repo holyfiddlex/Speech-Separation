@@ -6,25 +6,25 @@ __all__ = ['MaskBase', 'MaskBinary', 'MaskcIRM', 'Maskify']
 from .imports import *
 from .plot import *
 from .utils import *
+from .base import *
 from .core import *
 
 # Cell
 class MaskBase():
     _show_args={}
-    def __init__(self, data, spec_func):
-        store_attr(self, 'data', 'spec_func')
+    def __init__(self, data):
+        store_attr(self, 'data')
     @property
     def shape(self):
         return self.data.shape
     @classmethod
-    def create(cls, audios):
-        joined = join_audios(audios)
-        return [cls.generate(audio, joined) for audio in audios]
+    def create(cls, specs, mix_spec):
+        return [cls.generate(spec, mix_spec) for spec in specs]
     def __mul__(self, spec):
         raise NotImplementedError('This function needs to be implemented before use')
     def __rmul__(self, spec):
         return self*spec
-    def generate(self, audio, joined):
+    def generate(self, spec, mix_spec):
         raise NotImplementedError('This function needs to be implemented before use')
     @delegates(setup_graph)
     def show(self, ctx=None, **kwargs): return show_mask(self, ctx=ctx, **merge(self._show_args, kwargs))
@@ -33,30 +33,30 @@ class MaskBase():
 # Cell
 class MaskBinary(MaskBase):
     def __mul__(self, spec):
-        new_spec = SpecImage(spec.data*self.data, spec.sr, spec.fn)
+        new_spec = SpecBase(spec.data*self.data, spec.sr, spec.fn)
         return new_spec
     @classmethod
-    def generate(cls, audio, joined):
-        specs = self.spec_func(audio)
-        return (joined.data <= spec.data)*1
+    def generate(cls, spec, mix_spec):
+        return cls((mix_spec.data <= spec.data)*1)
 
 # Cell
 class MaskcIRM(MaskBase):
     def __mul__(self, spec):
-        new_spec = SpecImage(spec.data*self.data, spec.sr, spec.fn)
+        new_spec = SpecBase(spec.data*self.data, spec.sr, spec.fn)
         return new_spec
     @classmethod
-    def generate(cls, audio, joined):
-        specs = self.spec_func(audio)
-        return (joined.data <= spec.data)*1
+    def generate(cls, spec, mix_spec):
+        return cls((mix_spec.data <= spec.data)*1)
 
 # Cell
 class Maskify(TupleTransform):
     as_item_force=True
-    def __init__(self, MaskType=MaskBinary, Aud2Spec=Spectify):
+    def __init__(self, MaskType=MaskcIRM, Aud2Spec=Spectify()):
         store_attr(self, "MaskType, Aud2Spec")
     def encodes(self, audioList)->None:
-        maskList = self.MaskType.create(audioList)
+        specList = [self.Aud2Spec(a) for a in audioList]
+        mix_spec = self.Aud2Spec(AudioBase(join_audios(audioList), audioList[0].sr))
+        maskList = self.MaskType.create(specList, mix_spec)
         return audioList, maskList
     def decodes(self, audioList, maskList)->None:
         return [a*m for a in zip(audioList, maskList)]

@@ -78,12 +78,12 @@ def spec2tensor(spec:SpecBase): return TensorSpec(spec.data)
 class Spectify(Transform):
     def __init__(self, sr=48000, stft=stft, istft=istft):
         store_attr(self, 'sr, stft, istft')
-    def encodes(self, audio:AudioMono):
+    def encodes(self, audio:AudioBase):
         spec = self.stft(audio.sig)
         return SpecImage(spec, audio.sr, audio.fn)
     def decodes(self, spec:SpecBase):
         audio = self.istft(spec.data)
-        return AudioMono(audio, spec.sr, spec.fn)
+        return AudioBase(audio, spec.sr, spec.fn)
     def decodes(self, data:ArraySpecBase):
         return SpecImage(data, self.sr)
 

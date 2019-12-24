@@ -85,7 +85,6 @@ def get_shape(olist):
 # Cell
 def join_audios(audio_list):
     np_list = audio_list if isinstance(audio_list[0], ndarray) else [audio.data for audio in audio_list]
-    mix = np.zeros(get_shape(np_list), dtype=complex)
+    mix = np.zeros(get_shape(np_list))
     for aud in np_list: mix+=aud
-    mix /= len(np_list)
     return mix
