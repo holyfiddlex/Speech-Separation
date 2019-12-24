@@ -49,7 +49,8 @@ index = {"load_audio": "00_core.ipynb",
          "audio_extensions": "03_data.ipynb",
          "MaskBase": "05_Masks.ipynb",
          "MaskBinary": "05_Masks.ipynb",
-         "MaskcIRM": "05_Masks.ipynb"}
+         "MaskcIRM": "05_Masks.ipynb",
+         "Maskify": "05_Masks.ipynb"}
 
 modules = ["core.py",
            "base.py",

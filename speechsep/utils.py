@@ -80,7 +80,7 @@ def get_shape(olist):
     "Get the shape of items in iterable. If there are different lengths an error will occur"
     shapes = set([o.shape for o in olist])
     if len(shapes) > 1: ValueError("To generate Masks make sure that the length of files are equal.")
-    return lengths.pop()
+    return shapes.pop()
 
 # Cell
 def join_audios(audio_list):
