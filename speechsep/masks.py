@@ -42,7 +42,7 @@ class MaskBinary(MaskBase):
         return new_spec
     @classmethod
     def generate(cls, spec, mix_spec):
-        Binary = (safe_div(spec.data,mix_spec.data) >= 1)*1
+        Binary = (safe_div(abs(spec.data),abs(mix_spec.data)) >= 1)*1
         return cls(Binary)
 
 # Cell
@@ -65,15 +65,12 @@ class Maskify(TupleTransform):
         joined = AudioBase(join_audios(audioList), audioList[0].sr)
         mix_spec = self.Aud2Spec(joined)
         maskList = self.MaskType.create(specList, mix_spec)
-        mix_spec.show()
-        return joined, maskList
-    def decodes(self, audio_maskList)->None:
-        joined, maskList = audio_maskList
-        joined.listen()
-        spec = self.Aud2Spec(joined)
-        spec.show()
-        print(maskList)
-        temp = [spec*m for m in maskList]
-        for x in temp:
-            self.Aud2Spec.decode(x).listen()
+        for m in maskList:
+            self.Aud2Spec.decode(mix_spec*m).listen()
+        return mix_spec, maskList
+    def decodes(self, spec_mask)->None:
+        mix_spec, maskList = spec_mask
+        self.Aud2Spec.decode(mix_spec).listen()
+        for m in maskList:
+            self.Aud2Spec.decode(mix_spec*m).listen()
         return [self.Aud2Spec.decode(spec*m) for m in maskList]
