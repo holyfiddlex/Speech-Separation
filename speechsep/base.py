@@ -22,10 +22,13 @@ class AudioBase():
     _show_args={}
     def __init__(self,sig,_sr,fn=None):
         store_attr(self, 'sig,_sr,fn')
-        self.data = self.sig
     def __repr__(self): self.listen(); return f'{self.__str__()}'
     def __str__(self): return f'{self.fn}, {self.duration}secs at {self.sr} samples per second'
     def listen(self): display(Audio(self.sig, rate=self.sr))
+    @property
+    def data(self): return self.sig
+    @data.setter
+    def data(self, new_data): self.sig = new_data
     @property
     def sr(self): return self._sr
     @sr.setter
