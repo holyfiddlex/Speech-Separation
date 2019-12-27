@@ -89,12 +89,11 @@ class Spectify(Transform):
 
 # Cell
 class Decibelify(Transform):
-    def __init__(self): pass
     def encodes(self,spec:SpecImage):
-        spec.data = np.log(spec.data)
+        spec.data = np.log10(spec.data)
         return spec
     def decodes(self,spec:SpecImage):
-        spec.data = np.exp(spec.data)
+        spec.data = np.power(10, spec.data)
         return spec
 
 # Cell
