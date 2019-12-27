@@ -65,12 +65,7 @@ class Maskify(TupleTransform):
         joined = AudioBase(join_audios(audioList), audioList[0].sr)
         mix_spec = self.Aud2Spec(joined)
         maskList = self.MaskType.create(specList, mix_spec)
-        for m in maskList:
-            self.Aud2Spec.decode(mix_spec*m).listen()
         return mix_spec, maskList
     def decodes(self, spec_mask)->None:
         mix_spec, maskList = spec_mask
-        self.Aud2Spec.decode(mix_spec).listen()
-        for m in maskList:
-            self.Aud2Spec.decode(mix_spec*m).listen()
         return [self.Aud2Spec.decode(spec*m) for m in maskList]
