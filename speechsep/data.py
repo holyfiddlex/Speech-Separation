@@ -5,6 +5,7 @@ __all__ = ['get_audio_files', 'AudioBlock', 'audio_extensions']
 # Cell
 from .imports import *
 from .core import *
+from .masks import *
 
 # Cell
 audio_extensions = set(k for k,v in mimetypes.types_map.items() if v.startswith('audio/'))
