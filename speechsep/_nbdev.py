@@ -52,7 +52,15 @@ index = {"load_audio": "00_core.ipynb",
          "MaskBase": "05_Masks.ipynb",
          "MaskBinary": "05_Masks.ipynb",
          "MaskcIRM": "05_Masks.ipynb",
-         "Maskify": "05_Masks.ipynb"}
+         "Maskify": "05_Masks.ipynb",
+         "init_weights": "07_Model.ipynb",
+         "conv_block": "07_Model.ipynb",
+         "up_conv": "07_Model.ipynb",
+         "Recurrent_block": "07_Model.ipynb",
+         "RRCNN_block": "07_Model.ipynb",
+         "single_conv": "07_Model.ipynb",
+         "Attention_block": "07_Model.ipynb",
+         "U_Net": "07_Model.ipynb"}
 
 modules = ["core.py",
            "base.py",
@@ -60,9 +68,9 @@ modules = ["core.py",
            "plot.py",
            "data.py",
            "learner.py",
-           "masks.py"]
+           "masks.py",
+           "models.py"]
 
 git_url = "https://github.com/holyfiddlex/speechsep/tree/master/"
-
 
 def custom_doc_links(name): return None

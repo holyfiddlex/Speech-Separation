@@ -89,5 +89,5 @@ def join_audios(audioList):
     for aud in np_list: mix+=aud
     return mix
 
-def Mixer(Transform):
-    def encoder(self, audioList): return join_audios(audioList),audioList
+class Mixer(Transform):
+    def encodes(self, audioList): return join_audios(audioList),audioList
