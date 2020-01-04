@@ -137,5 +137,5 @@ checklink/cookies.txt
 .gitconfig
 
 nbdev/speechsep
-data/SmallDataset
+data/esc50_sample
 Untitled*.ipynb
