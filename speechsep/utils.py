@@ -4,6 +4,7 @@ __all__ = ['time_bins', 'stft', 'istft', 'complex2real', 'real2complex', 'get_sh
 
 # Cell
 from .imports import *
+from .base import *
 
 # Cell
 def time_bins(X, window_size, overlap):
@@ -90,4 +91,8 @@ def join_audios(audioList):
     return mix
 
 class Mixer(Transform):
-    def encodes(self, audioList): return join_audios(audioList),audioList
+    as_item_force=True
+    def encodes(self, audioList):
+        joined = join_audios(audioList)
+        AudioType, sr = type(audioList[0]), audioList[0].sr
+        return Tuple(AudioType(joined, sr)) + Tuple(audioList)
