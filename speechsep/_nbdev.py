@@ -53,6 +53,9 @@ index = {"load_audio": "00_core.ipynb",
          "MaskBinary": "05_Masks.ipynb",
          "MaskcIRM": "05_Masks.ipynb",
          "Maskify": "05_Masks.ipynb",
+         "SiameseSpec": "06_Pipe.ipynb",
+         "SiamesePiar": "06_Pipe.ipynb",
+         "AudioPipe": "06_Pipe.ipynb",
          "init_weights": "07_Model.ipynb",
          "conv_block": "07_Model.ipynb",
          "up_conv": "07_Model.ipynb",
@@ -69,6 +72,7 @@ modules = ["core.py",
            "data.py",
            "learner.py",
            "masks.py",
+           "pipe.py",
            "models.py"]
 
 git_url = "https://github.com/holyfiddlex/speechsep/tree/master/"
