@@ -89,12 +89,13 @@ class Spectify(Transform):
 
 # Cell
 class Decibelify(Transform):
-    def encodes(self,spec:SpecImage):
-        spec.data = np.log10(spec.data)
-        return spec
-    def decodes(self,spec:SpecImage):
-        spec.data = np.power(10, spec.data)
-        return spec
+    def encodes(self,spec:SpecBase):
+        new_data = np.log10(spec.data)
+        return type(spec)(new_data, spec.sr, spec.fn)
+
+    def decodes(self,spec:SpecBase):
+        new_data = np.power(10, spec.data)
+        return type(spec)(new_data, spec.sr, spec.fn)
 
 # Cell
 from librosa.feature import melspectrogram
