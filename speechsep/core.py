@@ -90,7 +90,7 @@ class Spectify(Transform):
 # Cell
 class Decibelify(Transform):
     def encodes(self,spec:SpecBase):
-        new_data = np.log10(spec.data)
+        new_data = np.ma.log10(spec.data).filled(-324)
         return type(spec)(new_data, spec.sr, spec.fn)
 
     def decodes(self,spec:SpecBase):
