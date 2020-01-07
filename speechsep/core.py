@@ -2,7 +2,7 @@
 
 __all__ = ['load_audio', 'AudioMono', 'duration', 'SpecImage', 'ArrayAudioBase', 'ArraySpecBase', 'ArrayMaskBase',
            'TensorAudio', 'TensorSpec', 'TensorMask', 'encodes', 'encodes', 'audio2tensor', 'spec2tensor', 'Spectify',
-           'Decibelify', 'Mel_Binify_lib', 'MFCCify', 'create', 'Resample', 'Clip', 'PhaseManager']
+           'Decibelify', 'Mel_Binify_lib', 'MFCCify', 'create', 'Resample', 'Clip', 'Normalize', 'PhaseManager']
 
 # Cell
 from .imports import *
@@ -142,6 +142,14 @@ class Clip(Transform):
         else:
             x.sig = x.sig[:new_sig_len]
         return x
+
+# Cell
+class Normalize(Transform):
+    #normalize based on highest peak
+    def encodes(self, x:SpecBase):
+        ratio = np.max(np.abs(x.data))
+        norm = x.data/ratio
+        return type(x)(norm, x.sr, x.fn)
 
 # Cell
 class PhaseManager(Transform):
