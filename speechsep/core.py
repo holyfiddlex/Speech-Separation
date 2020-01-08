@@ -90,7 +90,7 @@ class Spectify(Transform):
 # Cell
 class Decibelify(Transform):
     def encodes(self,spec:SpecBase):
-        new_data = np.ma.log10(spec.data).filled(-324)
+        new_data = np.log10(spec.data)
         return type(spec)(new_data, spec.sr, spec.fn)
 
     def decodes(self,spec:SpecBase):
@@ -136,9 +136,8 @@ class Clip(Transform):
     def __init__(self, time): self.time = time
     def encodes(self, x:AudioBase):
         new_sig_len = int(self.time*x.sr)
-        diff = abs(len(x.sig) - new_sig_len)
         if len(x.sig) <= new_sig_len:
-            x.sig = np.pad(x.sig, (0,diff), 'constant', constant_values=(0, 0))
+            x.sig = fill(x.sif, new_sig_len)
         else:
             x.sig = x.sig[:new_sig_len]
         return x
