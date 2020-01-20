@@ -90,6 +90,19 @@ class Spectify(Transform):
 # Cell
 class Decibelify(Transform):
     def encodes(self,spec:SpecBase):
+        np.seterr(divide='ignore'); new_data = np.log10(spec.data); np.seterr(divide='warn')
+        noise = randomComplex(spec.data.shape)*0.0001
+        filtr = np.isinf(new_data)
+        new_data = np.where(filtr, 0, new_data)+noise
+        return type(spec)(new_data, spec.sr, spec.fn)
+
+    def decodes(self,spec:SpecBase):
+        new_data = np.power(10, spec.data)
+        return type(spec)(new_data, spec.sr, spec.fn)
+
+# Cell
+class _Decibelify_old(Transform):
+    def encodes(self,spec:SpecBase):
         new_data = np.log10(spec.data)
         return type(spec)(new_data, spec.sr, spec.fn)
 
