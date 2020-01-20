@@ -78,6 +78,8 @@ modules = ["core.py",
            "pipe.py",
            "models.py"]
 
+doc_url = "https://holyfiddlex.github.io/speechsep/"
+
 git_url = "https://github.com/holyfiddlex/speechsep/tree/master/"
 
 def custom_doc_links(name): return None
