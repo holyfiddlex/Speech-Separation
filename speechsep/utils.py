@@ -77,11 +77,11 @@ def randomComplex(shape):
     return randcmplx[:,:,0]+randcmplx[:,:,1]*1j
 
 # Cell
-def complex2real(spec):
-    if np.iscomplexobj(spec.data):
-        spec.data = np.concatenate((spec.data.real[..., np.newaxis], spec.data.imag[..., np.newaxis]), axis=-1)
-        spec.data = spec.data.T
-    return spec
+def complex2real(data):
+    if np.iscomplexobj(data):
+        new_data = np.concatenate((data.real[..., np.newaxis], data.imag[..., np.newaxis]), axis=-1)
+        return new_data.T
+    return data
 
 def real2complex(data):
     data = data.numpy().T
