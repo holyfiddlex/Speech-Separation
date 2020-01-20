@@ -73,7 +73,6 @@ modules = ["core.py",
            "utils.py",
            "plot.py",
            "data.py",
-           "learner.py",
            "masks.py",
            "pipe.py",
            "models.py"]
