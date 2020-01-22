@@ -33,7 +33,7 @@ class Group(Transform):
         return Tuple(audioList[0], *Tuple(audioList[1]))
 
 # Cell
-def AudioPipe(path):
+def AudioPipe(path, sr=22050, duration=5):
     items = get_audio_files(path)
     sp = SiamesePiar(items, items.map(parent_label))
-    return Pipeline([sp, AudioMono.create, Resample(22050), Clip(5), Mixer, Spectify(), Normalize(), Decibelify(), Group()])
+    return Pipeline([sp, AudioMono.create, Resample(sr), Clip(duration), Mixer, Spectify(), Normalize(), Decibelify(), Group()])
