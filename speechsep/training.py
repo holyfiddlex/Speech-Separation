@@ -21,24 +21,29 @@ fn = Path("../data/esc50_sample/")
 pipe = AudioPipe(fn)
 
 # Cell
+class Tensorify(Transform):
+    def encodes(self, x):
+        tnsr = complex2real(x.data) if hasattr(x, "data") else complex2real(x)
+        return torch.FloatTensor(tnsr)
+
 class AudioDataset(Dataset):
     @delegates(AudioPipe)
     def __init__(self, fn, **kwargs):
         self.fn = fn
-        self.pipe = AudioPipe(fn)
+        self.pipe = AudioPipe(fn, **kwargs)
         self.n_samples = len(get_audio_files(fn))
 
     def __getitem__(self, index):
         x,y = self.pipe(index)
-        x,y = ToTensor()(x)[:,:208],ToTensor()(y) #Hack add multiple or padding to pipeline
+        x,y = Tensorify()(x),Tensorify()(y)
         return x,y
 
     def __len__(self):
         return self.n_samples
 
 # Cell
-dataset = AudioDataset(fn)
-dataloader = DataLoader(dataset=dataset, batch_size=4, shuffle=True, num_workers=2)
+dataset = AudioDataset(fn, sr=41000, duration=100)
+dataloader = DataLoader(dataset=dataset, batch_size=1, shuffle=True, num_workers=2)
 
 dataiter = iter(dataloader)
 
