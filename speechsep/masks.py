@@ -38,8 +38,9 @@ class MaskBinary(MaskBase):
     def __init__(self, data, threshold=1):
         store_attr(self, 'data')
     def __mul__(self, spec):
-        new_spec = SpecBase(spec.data*self.data, spec.sr, spec.fn)
-        return new_spec
+        if isinstance(spec, torch.Tensor): return spec*self.data
+        return SpecBase(spec.data*self.data, spec.sr, spec.fn)
+
     @classmethod
     def generate(cls, spec, mix_spec):
         Binary = (safe_div(abs(spec.data),abs(mix_spec.data)) >= 1)*1
@@ -48,6 +49,9 @@ class MaskBinary(MaskBase):
 # Cell
 class MaskcIRM(MaskBase):
     def __mul__(self, spec):
+        if isinstance(spec, torch.Tensor):
+            comp_spec = real2complex(spec)
+            return spec*self.data
         return SpecBase(spec.data*self.data, spec.sr)
 
     @classmethod
