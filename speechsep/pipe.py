@@ -36,4 +36,4 @@ class Group(Transform):
 def AudioPipe(path, sr=22050, duration=5):
     items = get_audio_files(path)
     sp = SiamesePiar(items, items.map(parent_label))
-    return Pipeline([sp, AudioMono.create, Resample(sr), Clip(duration), Mixer, Spectify(), Normalize(), Decibelify(), Group()])
+    return Pipeline([sp, AudioMono.create, Resample(sr), Clip(duration), Mixer, Spectify(), Unet_Trimmer(8), Normalize(), Decibelify(), Group()])
