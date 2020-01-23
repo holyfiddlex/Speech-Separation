@@ -49,10 +49,11 @@ class MaskBinary(MaskBase):
 # Cell
 class MaskcIRM(MaskBase):
     def __mul__(self, spec):
-        if isinstance(spec, torch.Tensor):
-            comp_spec = real2complex(spec)
-            return spec*self.data
-        return SpecBase(spec.data*self.data, spec.sr)
+        if isinstance(spec, SpecBase):
+            return SpecBase(spec.data*self.data, spec.sr)
+        elif self.data.requires_grad == True or spec.requires_grad == True:
+            return complex_mult(self.data, spec)
+        return real2complex(spec)*real2complex(self.data)
 
     @classmethod
     def generate(cls, spec, mix_spec):
