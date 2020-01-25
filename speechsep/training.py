@@ -28,7 +28,7 @@ pipe = AudioPipe(fn)
 class Tensorify(Transform):
     def encodes(self, x, cuda=True):
         tnsr = complex2real(x.data) if hasattr(x, "data") else complex2real(x)
-        return torch.FloatTensor(tnsr).cuda() if cuda else torch.FloatTensor(tnsr)
+        return torch.cuda.FloatTensor(tnsr)
 
 class AudioDataset(Dataset):
     @delegates(AudioPipe)
@@ -52,14 +52,14 @@ def loss_func(x,y):
     return min_loss
 
 # Cell
-bs = 16
+bs = 4
 shuffle=True
-workers=2
+workers=0
 
 # Cell
 dataset = AudioDataset(fn)
 n = len(dataset)
-train_ds, valid_ds, test_ds = torch.utils.data.random_split(dataset, [50, 25, n-75])
+train_ds, valid_ds, test_ds = torch.utils.data.random_split(dataset, [5000, 2500, n-7500])
 train_dl = DataLoader(dataset=train_ds, batch_size=bs, shuffle=shuffle, num_workers=workers)
 valid_dl = DataLoader(dataset=valid_ds, batch_size=bs, shuffle=shuffle, num_workers=workers)
 test_dl = DataLoader(dataset=test_ds, batch_size=bs, shuffle=shuffle, num_workers=workers)
@@ -72,7 +72,7 @@ model = U_Net(img_ch=2, output_ch=4).cuda()
 model.train();
 
 # Cell
-n_epochs = 1
+n_epochs = 10
 n_samples = len(train_dl.dataset)
 n_iter = math.ceil(n_samples/bs)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
@@ -80,18 +80,16 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 # Cell
 for epoch in range(n_epochs):
     for i, (xb, yb) in tqdm(enumerate(train_dl)):
-        print(1)
         out = model(xb)
-        print(2)
         mask1 = MaskcIRM(out[:,:2,:,:])
         mask2 = MaskcIRM(out[:,2:,:,:])
         sep = mask1*xb, mask2*xb
         loss = loss_func(sep, yb)
-        print(3)
+
         #if (i+1)%5==0:
         #    print(f'epoch {epoch}: step {(i+1)/n_iter}')
         loss.backward()
         optimizer.step()
         optimizer.zero_grad()
-        print(4)
-    print(f"epoch {epoch+1} Finished")
+    torch.save(model.state_dict(), f"../models/unet_{epoch+1}")
+    print(f"epoch {epoch+1} Finished, saved model")
