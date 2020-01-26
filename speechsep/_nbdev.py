@@ -62,6 +62,7 @@ index = {"load_audio": "00_core.ipynb",
          "bs": "04_Trainer.ipynb",
          "shuffle": "04_Trainer.ipynb",
          "workers": "04_Trainer.ipynb",
+         "seed": "04_Trainer.ipynb",
          "dataset": "04_Trainer.ipynb",
          "n": "04_Trainer.ipynb",
          "train_dl": "04_Trainer.ipynb",
@@ -74,6 +75,7 @@ index = {"load_audio": "00_core.ipynb",
          "n_samples": "04_Trainer.ipynb",
          "n_iter": "04_Trainer.ipynb",
          "optimizer": "04_Trainer.ipynb",
+         "state": "04_Trainer.ipynb",
          "safe_div": "05_Masks.ipynb",
          "MaskBase": "05_Masks.ipynb",
          "MaskBinary": "05_Masks.ipynb",
@@ -100,6 +102,8 @@ modules = ["core.py",
            "masks.py",
            "pipe.py",
            "models.py"]
+
+doc_url = "https://holyfiddlex.github.io/speechsep/"
 
 git_url = "https://github.com/holyfiddlex/speechsep/tree/master/"
 
