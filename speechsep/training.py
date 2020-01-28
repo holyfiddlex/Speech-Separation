@@ -45,11 +45,6 @@ class AudioDataset(Dataset):
     def __len__(self):
         return self.n_samples
 
-    def getitem_eval(self, index):
-        x,y = self.pipe(index)
-        x,y = Tensorify()(x),Tensorify()(y)
-        return x,y
-
 # Cell
 def loss_func(x,y):
     loss = nn.MSELoss()
@@ -66,7 +61,7 @@ torch.manual_seed(seed);
 # Cell
 dataset = AudioDataset(fn)
 n = len(dataset)
-train_ds, valid_ds, test_ds = torch.utils.data.random_split(dataset, [5000, 2500, n-7500])
+train_ds, valid_ds, test_ds = torch.utils.data.random_split(dataset, [1000, 500, n-1500])
 train_dl = DataLoader(dataset=train_ds, batch_size=bs, shuffle=shuffle, num_workers=workers)
 valid_dl = DataLoader(dataset=valid_ds, batch_size=1, shuffle=shuffle, num_workers=workers)
 test_dl = DataLoader(dataset=test_ds, batch_size=1, shuffle=shuffle, num_workers=workers)
@@ -75,10 +70,10 @@ dataiter = iter(train_dl)
 data = dataiter.next()
 
 # Cell
-model = U_Net(img_ch=2, output_ch=4).cuda()
+model = U_Net(img_ch=2, output_ch=2).cuda()
 
 # Cell
-n_epochs = 5
+n_epochs = 16
 n_samples = len(train_dl.dataset)
 n_iter = math.ceil(n_samples/bs)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
@@ -88,8 +83,8 @@ model.train()
 for epoch in range(n_epochs):
     for i, (xb, yb) in tqdm(enumerate(train_dl)):
         out = model(xb)
-        mask1 = MaskcIRM(out[:,:2,:,:])
-        mask2 = MaskcIRM(out[:,2:,:,:])
+        mask1 = MaskBinary(out[:,:1,:,:])
+        mask2 = MaskBinary(out[:,1:,:,:])
         sep = mask1*xb, mask2*xb
         loss = loss_func(sep, yb)
 
@@ -98,36 +93,83 @@ for epoch in range(n_epochs):
         loss.backward()
         optimizer.step()
         optimizer.zero_grad()
-    torch.save(model.state_dict(), f"../models/unet_{epoch+1}")
+    torch.save(model.state_dict(), f"../models/unet_{epoch+1}_binary")
     print(f"epoch {epoch+1} Finished, saved model")
 
 # Cell
-state = torch.load('../models/unet_5')
-model.load_state_dict(state)
 model.cpu()
 model.eval()
 for i, (xb, yb) in tqdm(enumerate(valid_dl)):
     xb,yb = xb.detach().cpu(), [yb[i].detach().cpu() for i in range(2)]
-    #out = model(xb)
-    #mask1 = MaskcIRM(out[:,:2,:,:])
-    #mask2 = MaskcIRM(out[:,2:,:,:])
+    out = model(xb)
+    mask1 = MaskBinary(out[:,:1,:,:])
+    mask2 = MaskBinary(out[:,1:,:,:])
 
-    #sep = mask1*xb, mask2*xb
-    #sep = [sep[i].detach().cpu().squeeze() for i in range(len(sep))]
-    #sep = [real2complex(sep[i]) for i in range(len(sep))]
-    #spec1, spec2 = SpecImage(sep[0], 22050), SpecImage(sep[1], 22050)
+    sep = mask1*xb, mask2*xb
+    sep = [sep[i].detach().cpu().squeeze() for i in range(len(sep))]
+    sep = [real2complex(sep[i]) for i in range(len(sep))]
+    spec1, spec2 = SpecImage(sep[0], 22050), SpecImage(sep[1], 22050)
 
     spec_mixed = xb.detach().cpu().squeeze()
     spec_mixed = real2complex(spec_mixed)
     spec_mixed = SpecImage(spec_mixed, 22050)
 
+    spec1.show()
+    spec2.show()
     spec_mixed.show()
 
-    #audio1 = Spectify().decode(spec1)
-    #audio2 = Spectify().decode(spec2)
+    print(spec1.data[0][0])
+    spec1 = Decibelify().decode(spec1)
+    spec2 = Decibelify().decode(spec2)
+    spec_mixed = Decibelify().decode(spec_mixed)
+
+    print(spec1.data[0][0])
+    audio1 = Spectify().decode(spec1)
+    audio2 = Spectify().decode(spec2)
     audio_mixed = Spectify().decode(spec_mixed)
 
-    #audio1.listen()
-    #audio2.listen()
+    print(audio1.data[0])
+    audio1.listen()
+    audio2.listen()
+    audio_mixed.listen()
+    break
+
+# Cell
+state = torch.load('../models/unet_1_binary')
+model.load_state_dict(state)
+model.cpu()
+model.eval()
+for i, (xb, yb) in tqdm(enumerate(valid_dl)):
+    xb,yb = xb.detach().cpu(), [yb[i].detach().cpu() for i in range(2)]
+    out = model(xb)
+    mask1 = MaskBinary(out[:,:1,:,:])
+    mask2 = MaskBinary(out[:,1:,:,:])
+
+    sep = mask1*xb, mask2*xb
+    sep = [sep[i].detach().cpu().squeeze() for i in range(len(sep))]
+    sep = [real2complex(sep[i]) for i in range(len(sep))]
+    spec1, spec2 = SpecImage(sep[0], 22050), SpecImage(sep[1], 22050)
+
+    spec_mixed = xb.detach().cpu().squeeze()
+    spec_mixed = real2complex(spec_mixed)
+    spec_mixed = SpecImage(spec_mixed, 22050)
+
+    spec1.show()
+    spec2.show()
+    spec_mixed.show()
+
+    print(spec1.data[0][0])
+    spec1 = Decibelify().decode(spec1)
+    spec2 = Decibelify().decode(spec2)
+    spec_mixed = Decibelify().decode(spec_mixed)
+
+    print(spec1.data[0][0])
+    audio1 = Spectify().decode(spec1)
+    audio2 = Spectify().decode(spec2)
+    audio_mixed = Spectify().decode(spec_mixed)
+
+    print(audio1.data[0])
+    audio1.listen()
+    audio2.listen()
     audio_mixed.listen()
     break
