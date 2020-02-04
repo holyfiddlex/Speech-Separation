@@ -48,6 +48,10 @@ class AudioDataset(Dataset):
 # Cell
 def loss_func(x,y):
     loss = nn.MSELoss()
+    print(x[0].shape)
+    print(x[1].shape)
+    print(y[0].shape)
+    print(y[1].shape)
     min_loss = min(loss(x[0],y[0]) + loss(x[1],y[1]), loss(x[0],y[1]) + loss(x[1],y[0]))
     return min_loss
 
@@ -89,7 +93,7 @@ for epoch in range(n_epochs):
         if (out!=out).any():
             raise AssertionError(f'Output contained nan during epoch {epoch} and step {i}')
         mask1 = MaskBinary(out[:,:1,:,:])
-        mask2 = MaskcIRM(out[:,1:,:,:])
+        mask2 = MaskBinary(out[:,1:,:,:])
         sep = mask1*xb, mask2*xb
         loss = loss_func(sep, yb)
 
