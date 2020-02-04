@@ -48,11 +48,11 @@ class AudioDataset(Dataset):
 # Cell
 def loss_func(x,y):
     loss = nn.MSELoss()
-    min_loss = min([loss(x[i], y[i]) for i in range(len(x))])
+    min_loss = min(loss(x[0],y[0]) + loss(x[1],y[1]), loss(x[0],y[1]) + loss(x[1],y[0]))
     return min_loss
 
 # Cell
-bs = 2
+bs = 4
 shuffle=True
 workers=0
 seed=42
@@ -73,7 +73,7 @@ data = dataiter.next()
 model = U_Net(img_ch=2, output_ch=2).cuda()
 
 # Cell
-n_epochs = 16
+n_epochs = 8
 n_samples = len(train_dl.dataset)
 n_iter = math.ceil(n_samples/bs)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
@@ -82,9 +82,14 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 model.train()
 for epoch in range(n_epochs):
     for i, (xb, yb) in tqdm(enumerate(train_dl)):
+        if (xb!=xb).any():
+            raise AssertionError(f'Input contained nan during epoch {epoch} and step {i}')
         out = model(xb)
+        print(torch.Tensor([out.max().item(), out.min().item()]), i)
+        if (out!=out).any():
+            raise AssertionError(f'Output contained nan during epoch {epoch} and step {i}')
         mask1 = MaskBinary(out[:,:1,:,:])
-        mask2 = MaskBinary(out[:,1:,:,:])
+        mask2 = MaskcIRM(out[:,1:,:,:])
         sep = mask1*xb, mask2*xb
         loss = loss_func(sep, yb)
 
@@ -93,7 +98,7 @@ for epoch in range(n_epochs):
         loss.backward()
         optimizer.step()
         optimizer.zero_grad()
-    torch.save(model.state_dict(), f"../models/unet_{epoch+1}_binary")
+    torch.save(model.state_dict(), f"../models/unet_{epoch+1}_complex")
     print(f"epoch {epoch+1} Finished, saved model")
 
 # Cell
