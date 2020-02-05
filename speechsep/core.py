@@ -80,8 +80,12 @@ class Decibelify(Transform):
     def encodes(self,spec:SpecBase):
         np.seterr(divide='ignore'); new_data = np.log10(spec.data); np.seterr(divide='warn')
         noise = randomComplex(spec.data.shape)*0.0001
-        filtr = np.isinf(new_data)
-        new_data = np.where(filtr, 0, new_data)+noise
+        filt1 = np.isinf(new_data)
+        filt2 = np.isnan(new_data)
+        new_data = np.where(filt1, 0, new_data)+noise
+        if np.isnan(new_data).any():
+            print(f"WARNING {np.sum(np.isnan(new_data))} NANS FOUND DECIBELIFY")
+        new_data = np.where(filt2, 0, new_data)+noise
         return type(spec)(new_data, spec.sr, spec.fn)
 
     def decodes(self,spec:SpecBase):

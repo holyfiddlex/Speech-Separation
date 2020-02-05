@@ -47,16 +47,18 @@ class AudioDataset(Dataset):
 
 # Cell
 def loss_func(x,y):
+    if (x[0]!=x[0]).any() or (x[1]!=x[1]).any():
+        raise AssertionError(f'Loss x contained nan')
+    if (y[0]!=y[0]).any() or (y[1]!=y[1]).any():
+        raise AssertionError(f'Loss y contained nan')
     loss = nn.MSELoss()
-    print(x[0].shape)
-    print(x[1].shape)
-    print(y[0].shape)
-    print(y[1].shape)
     min_loss = min(loss(x[0],y[0]) + loss(x[1],y[1]), loss(x[0],y[1]) + loss(x[1],y[0]))
+    if (min_loss!=min_loss).any():
+        raise AssertionError(f'Loss returned contained nan')
     return min_loss
 
 # Cell
-bs = 4
+bs = 2
 shuffle=True
 workers=0
 seed=42
@@ -89,7 +91,6 @@ for epoch in range(n_epochs):
         if (xb!=xb).any():
             raise AssertionError(f'Input contained nan during epoch {epoch} and step {i}')
         out = model(xb)
-        print(torch.Tensor([out.max().item(), out.min().item()]), i)
         if (out!=out).any():
             raise AssertionError(f'Output contained nan during epoch {epoch} and step {i}')
         mask1 = MaskBinary(out[:,:1,:,:])
