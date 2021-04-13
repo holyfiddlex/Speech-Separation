@@ -16,7 +16,7 @@ def safe_div(x,y):
 # Cell
 class MaskBase():
     _show_args={}
-    def __init__(self, data): store_attr(self, 'data')
+    def __init__(self, data): store_attr('data', self)
     @property
     def shape(self):
         return self.data.shape
@@ -36,7 +36,7 @@ class MaskBase():
 # Cell
 class MaskBinary(MaskBase):
     def __init__(self, data, threshold=1):
-        store_attr(self, 'data')
+        store_attr('data', self)
     def __mul__(self, spec):
         if isinstance(spec, torch.Tensor): return spec*self.data
         return SpecBase(spec.data*self.data, spec.sr, spec.fn)
@@ -61,10 +61,10 @@ class MaskcIRM(MaskBase):
         return cls(cIRM)
 
 # Cell
-class Maskify(TupleTransform):
+class Maskify(Transform):
     as_item_force=True
     def __init__(self, MaskType=MaskcIRM, Aud2Spec=Spectify()):
-        store_attr(self, "MaskType, Aud2Spec")
+        store_attr("MaskType, Aud2Spec", self)
     def encodes(self, audioList)->None:
         specList = [self.Aud2Spec(a) for a in audioList]
         joined = AudioBase(join_audios(audioList), audioList[0].sr)
@@ -74,3 +74,12 @@ class Maskify(TupleTransform):
     def decodes(self, spec_mask)->None:
         mix_spec, maskList = spec_mask
         return [self.Aud2Spec.decode(spec*m) for m in maskList]
+
+def mask2tensor(mask:MaskBase):
+    data = complex2real(mask.data)
+    return TensorMask(data)
+
+MaskBase._tensor_cls = TensorMask
+
+@ToTensor
+def encodes(self, o:MaskBase): return o._tensor_cls(mask2tensor(o))

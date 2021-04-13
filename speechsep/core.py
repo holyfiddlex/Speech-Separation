@@ -65,7 +65,7 @@ class TensorMask(TensorBase):
 # Cell
 class Spectify(Transform):
     def __init__(self, sr=48000, stft=stft, istft=istft):
-        store_attr(self, 'sr, stft, istft')
+        store_attr('sr, stft, istft', self)
     def encodes(self, audio:AudioBase):
         spec = self.stft(audio.sig)
         return SpecImage(spec, audio.sr, audio.fn)
@@ -123,13 +123,14 @@ class MFCCify(Transform):
         return SpecImage(spec, audio.sr)
 
 # Cell
-@patch_clsmthd
 @delegates(to=Spectify)
 def create(cls:SpecImage, fn, sr=None, **kwargs):
     #Open an `Audio` from path `fn`
     if isinstance(fn,(Path,str)): return cls.create(AudioMono.create(fn,sr))
     elif isinstance(fn,AudioMono): return Spectify(**kwargs)(fn)
     raise ValueError('fn must be AudioMono, Path or str')
+
+SpecImage.create = classmethod(create)
 
 # Cell
 AudioMono._tensor_cls = TensorAudio
@@ -173,7 +174,7 @@ class Normalize(Transform):
 class PhaseManager(Transform):
     def __init__(self, mthd="new_dim", cls=SpecImage):
         assert mthd in ['new_dim', 'remove', 'replace'], 'phase method must be either new_dim, remove or replace'
-        store_attr(self, 'mthd, cls')
+        store_attr('mthd, cls', self)
 
     def encodes(self, spec:SpecImage):
         if self.mthd == 'new_dim': return complex2real(spec)
@@ -185,6 +186,6 @@ class PhaseManager(Transform):
             #HACK not sure how else to get the output to be and ArraySpecBase
             # If this is removed Spectify would have to decode a numpy array and that's not always what we want.
             # If it doesn't find how to decode an ndarray it will try to show and ndarray doesn't have that function
-            temp = ArraySpecBase(spec.shape, dtype=np.complex)
+            temp = ArraySpecBase(data.shape, dtype=np.complex)
             temp[:,:] = data
             return temp

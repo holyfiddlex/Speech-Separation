@@ -21,7 +21,7 @@ def ResampleSignal(sr_new):
 class AudioBase():
     _show_args={}
     def __init__(self,sig,_sr,fn=None):
-        store_attr(self, 'sig,_sr,fn')
+        store_attr('sig,_sr,fn', self)
     def __repr__(self): self.listen(); return f'{self.__str__()}'
     def __str__(self): return f'{self.fn}, {self.duration}secs at {self.sr} samples per second'
     def listen(self): display(Audio(self.sig, rate=self.sr))
@@ -44,7 +44,7 @@ class AudioBase():
 class SpecBase():
     _show_args={}
     def __init__(self, data, sr, fn=None):
-        store_attr(self, 'data, sr, fn')
+        store_attr('data, sr, fn', self)
         self._plt_params = {}
     @property
     def plt_params(self): return self._plt_params
