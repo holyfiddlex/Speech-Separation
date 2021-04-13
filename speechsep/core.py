@@ -65,7 +65,7 @@ class TensorMask(TensorBase):
 # Cell
 class Spectify(Transform):
     def __init__(self, sr=48000, stft=stft, istft=istft):
-        store_attr(self, 'sr, stft, istft')
+        store_attr('sr, stft, istft', self)
     def encodes(self, audio:AudioBase):
         spec = self.stft(audio.sig)
         return SpecImage(spec, audio.sr, audio.fn)
@@ -173,7 +173,7 @@ class Normalize(Transform):
 class PhaseManager(Transform):
     def __init__(self, mthd="new_dim", cls=SpecImage):
         assert mthd in ['new_dim', 'remove', 'replace'], 'phase method must be either new_dim, remove or replace'
-        store_attr(self, 'mthd, cls')
+        store_attr('mthd, cls', self)
 
     def encodes(self, spec:SpecImage):
         if self.mthd == 'new_dim': return complex2real(spec)

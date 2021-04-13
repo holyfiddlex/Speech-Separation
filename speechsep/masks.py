@@ -16,7 +16,7 @@ def safe_div(x,y):
 # Cell
 class MaskBase():
     _show_args={}
-    def __init__(self, data): store_attr(self, 'data')
+    def __init__(self, data): store_attr('data', self)
     @property
     def shape(self):
         return self.data.shape
@@ -36,7 +36,7 @@ class MaskBase():
 # Cell
 class MaskBinary(MaskBase):
     def __init__(self, data, threshold=1):
-        store_attr(self, 'data')
+        store_attr('data', self)
     def __mul__(self, spec):
         if isinstance(spec, torch.Tensor): return spec*self.data
         return SpecBase(spec.data*self.data, spec.sr, spec.fn)
@@ -64,7 +64,7 @@ class MaskcIRM(MaskBase):
 class Maskify(TupleTransform):
     as_item_force=True
     def __init__(self, MaskType=MaskcIRM, Aud2Spec=Spectify()):
-        store_attr(self, "MaskType, Aud2Spec")
+        store_attr("MaskType, Aud2Spec", self)
     def encodes(self, audioList)->None:
         specList = [self.Aud2Spec(a) for a in audioList]
         joined = AudioBase(join_audios(audioList), audioList[0].sr)
