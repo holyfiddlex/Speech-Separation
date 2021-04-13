@@ -186,6 +186,6 @@ class PhaseManager(Transform):
             #HACK not sure how else to get the output to be and ArraySpecBase
             # If this is removed Spectify would have to decode a numpy array and that's not always what we want.
             # If it doesn't find how to decode an ndarray it will try to show and ndarray doesn't have that function
-            temp = ArraySpecBase(spec.shape, dtype=np.complex)
+            temp = ArraySpecBase(data.shape, dtype=np.complex)
             temp[:,:] = data
             return temp

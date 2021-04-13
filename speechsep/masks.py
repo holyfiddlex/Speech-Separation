@@ -74,3 +74,12 @@ class Maskify(Transform):
     def decodes(self, spec_mask)->None:
         mix_spec, maskList = spec_mask
         return [self.Aud2Spec.decode(spec*m) for m in maskList]
+
+def mask2tensor(mask:MaskBase):
+    data = complex2real(mask.data)
+    return TensorMask(data)
+
+MaskBase._tensor_cls = TensorMask
+
+@ToTensor
+def encodes(self, o:MaskBase): return o._tensor_cls(mask2tensor(o))
