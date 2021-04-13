@@ -123,13 +123,14 @@ class MFCCify(Transform):
         return SpecImage(spec, audio.sr)
 
 # Cell
-@patch_clsmthd
 @delegates(to=Spectify)
 def create(cls:SpecImage, fn, sr=None, **kwargs):
     #Open an `Audio` from path `fn`
     if isinstance(fn,(Path,str)): return cls.create(AudioMono.create(fn,sr))
     elif isinstance(fn,AudioMono): return Spectify(**kwargs)(fn)
     raise ValueError('fn must be AudioMono, Path or str')
+
+SpecImage.create = classmethod(create)
 
 # Cell
 AudioMono._tensor_cls = TensorAudio

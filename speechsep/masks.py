@@ -61,7 +61,7 @@ class MaskcIRM(MaskBase):
         return cls(cIRM)
 
 # Cell
-class Maskify(TupleTransform):
+class Maskify(Transform):
     as_item_force=True
     def __init__(self, MaskType=MaskcIRM, Aud2Spec=Spectify()):
         store_attr("MaskType, Aud2Spec", self)
