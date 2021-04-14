@@ -125,4 +125,4 @@ class Unet_Trimmer(Transform):
             trim = spec.data.shape[1]//self.trim_val*self.trim_val
             return type(spec)(spec.data[:,:trim], spec.sr, spec.fn)
         trim = spec.shape[1]//self.trim_val*self.trim_val
-        return data[:,:trim]
+        return spec[:,:trim]
