@@ -36,15 +36,18 @@ class MaskBase():
 # Cell
 class MaskBinary(MaskBase):
     def __init__(self, data, threshold=1):
-        store_attr('data', self)
+        store_attr('data, threshold', self)
     def __mul__(self, spec):
-        if isinstance(spec, torch.Tensor): return spec*self.data
-        return SpecBase(spec.data*self.data, spec.sr, spec.fn)
+        if isinstance(spec, torch.Tensor): return spec*(self.data >= self.threshold)
+        return SpecBase(spec.data*(self.data >= self.threshold), spec.sr, spec.fn)
 
     @classmethod
-    def generate(cls, spec, mix_spec):
-        Binary = (safe_div(abs(spec.data),abs(mix_spec.data)) >= 1)*1
+    def generate(cls, spec, mix_spec, threshold=1):
+        Binary = (safe_div(abs(spec.data),abs(mix_spec.data)) >= threshold)*1
         return cls(Binary)
+
+    def show_binary(self):
+        return show_mask((self.data >= self.threshold)*1)
 
 # Cell
 class MaskcIRM(MaskBase):

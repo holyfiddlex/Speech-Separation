@@ -64,14 +64,20 @@ def show_audio(aud, ax=None, pltsize=None, title=None, ctx=None, x_label=None, y
 @delegates(plt.pcolormesh)
 def show_spec(spec, ax=None, pltsize=None, title=None, ctx=None, x_label=None, y_label=None, axis=False, **kwargs):
     ax, spec = pre_plot(spec, ax, pltsize, ctx)
-    ax.pcolormesh(np.abs(spec.data[:spec.data.shape[0]//2]), **kwargs)
+    if len(spec.data.shape) == 3:
+        ax.pcolormesh(np.abs((spec.data[0].T)[:spec.data.shape[1]//2]), **kwargs)
+    else:
+        ax.pcolormesh(np.abs(spec.data[:spec.data.shape[0]//2]), **kwargs)
     return post_plot(ax, title, x_label, y_label, axis)
 
 # Cell
 @delegates(plt.pcolormesh)
 def show_mask(mask, ax=None, pltsize=None, title=None, ctx=None, x_label=None, y_label=None, axis=False, **kwargs):
     ax, mask = pre_plot(mask, ax, pltsize, ctx)
-    ax.pcolormesh(abs(mask), **kwargs)
+    if len(mask.data.shape) == 3:
+        ax.pcolormesh(abs(mask.data[0].T), **kwargs)
+    else:
+        ax.pcolormesh(abs(mask), **kwargs)
     return post_plot(ax, title, x_label, y_label, axis)
 
 # Cell
