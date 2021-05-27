@@ -42,8 +42,8 @@ class MaskBinary(MaskBase):
         return SpecBase(spec.data*(self.data >= self.threshold), spec.sr, spec.fn)
 
     @classmethod
-    def generate(cls, spec, mix_spec, threshold=1):
-        Binary = (safe_div(abs(spec.data),abs(mix_spec.data)) >= threshold)*1
+    def generate(cls, spec, mix_spec, threshold=0.9):
+        Binary = (abs(spec.data) <= threshold)*1
         return cls(Binary)
 
     def show_binary(self):

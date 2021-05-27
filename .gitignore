@@ -139,3 +139,4 @@ checklink/cookies.txt
 nbdev/speechsep
 data/esc50_sample
 Untitled*.ipynb
+*/*/*.pth
